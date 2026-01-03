@@ -25,8 +25,6 @@ function showAdminScreen() {
 // Generate Token
 function generateToken(userName, userContact) {
     const token = tokenCounter;
-
-    // Add to queueData
     queueData.push({ token: token, name: userName, contact: userContact });
 
     tokenCounter++;
@@ -37,6 +35,21 @@ function generateToken(userName, userContact) {
 
     // Update admin UI
     updateAdminTable();
+
+    // Save current user data for waiting page
+    localStorage.setItem("currentUserToken", token);            
+    localStorage.setItem("currentQueueSnapshot", JSON.stringify(queueData)); // snapshot of queue at this moment
+
+    // Redirect user to waiting page
+    const thankYouDiv = document.getElementById("thankYouMessage");
+    thankYouDiv.style.display = "block";    
+
+    // Hide the form
+    userForm.style.display = "none";
+
+    // show back Button
+    backBtn.style.display = "inline-block";
+
 }
 
 //===================================================================================================
@@ -118,11 +131,13 @@ nameInput.addEventListener("input", () => {
     // Max 30 chars
     if (nameInput.value.length > 30) nameInput.value = nameInput.value.slice(0, 30);
 
-    // Show green message if max reached
-    if (nameInput.value.length === 30) {
-        nameInput.style.borderColor = "green";
+    // Real-time message below input
+    if (nameInput.value.length > 0) {
+        nameMessage.textContent = "Max 30 characters";
+        nameMessage.className = "valid";
     } else {
-        nameInput.style.borderColor = "";
+        nameMessage.textContent = "";
+        nameMessage.className = "";
     }
 });
 
@@ -151,13 +166,22 @@ userForm.addEventListener("submit", (e) => {
     const name = nameInput.value.trim();
     const contact = contactInput.value.trim();
 
+    // Validate name
     if (name === "") {
         alert("Please enter your name.");
         return;
     }
+
+    // Validate contact length
     if (contact.length !== 10) {
-        alert("Please enter a valid 10-digit contact number.");
+        contactMessage.textContent = "Please enter a valid 10-digit contact number";
+        contactMessage.className = "invalid";
+        contactInput.focus();
         return;
+    } else {
+        // Show green valid message on submit
+        contactMessage.textContent = "Valid contact number";
+        contactMessage.className = "valid";
     }
 
     // Generate token
@@ -169,7 +193,56 @@ userForm.addEventListener("submit", (e) => {
     nameInput.style.borderColor = "";
 });
 
+
 //===================================================================================================
 // Initialize
 updateAdminTable();
 showUserScreen();
+
+//===================================================================================================
+// Redirect to Waiting Page Button
+const goToWaitingBtn = document.getElementById("goToWaiting");
+
+goToWaitingBtn.addEventListener("click", () => {
+    const currentToken = localStorage.getItem("currentUserToken");
+
+    if (!currentToken) {
+        alert("You don’t have a token yet. Please generate a token first.");
+        return;
+    }
+
+    window.location.href = "waiting.html";
+});
+
+//===================================================================================================
+// Back Button
+const backBtn = document.getElementById("backToForm");
+
+backBtn.addEventListener("click", () => {
+    // Show form again
+    userForm.style.display = "block";
+
+    // Hide thank you message
+    const thankYouDiv = document.getElementById("thankYouMessage");
+    thankYouDiv.style.display = "none";
+
+    // Hide Go to Waiting Page button
+    goToWaitingBtn.style.display = "none";
+
+    // Hide Back button itself
+    backBtn.style.display = "none";
+});
+
+//===================================================================================================
+// Open Admin Screen directly if redirected from waiting page
+if (localStorage.getItem("openAdminScreen") === "true") {
+    showAdminScreen();
+    localStorage.removeItem("openAdminScreen");
+}
+
+//===================================================================================================
+// Open Waiting List
+function openWaitingList() {
+    window.location.href = "waiting.html";
+}
+

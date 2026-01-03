@@ -6,17 +6,18 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h2>Queue Management System</h2>
+    <h1>WAIT-WISE</h1>
+    <h2>A Smart Queue Management System For Doctor Clinics</h2>
 
     <div class="switch-buttons">
-        <button onclick="showUserScreen()" >User Screen</button>
+        <button onclick="showUserScreen()" >Patient Screen</button>
         <button onclick="showAdminScreen()" >Admin Screen</button>
     </div>
 
     <hr>
 
     <div id="userScreen" class="screen">
-        <h3>User Panel</h3>
+        <h3>Let's Reserve your Appointment</h3>
 
         <form id="userForm" autocomplete="off">
             <label for="name">Full Name:</label>
@@ -29,15 +30,22 @@
 
             <button type="submit" style="margin-top: 15px;">Generate Token</button>
         </form>
+
         <p><strong>Your Token :</strong> <span id="userToken">None</span></p>
+
+        <div id="thankYouMessage" style="display:none; text-align:center; margin-top:20px;">
+            <p>Thank you! Your token has been generated.</p>
+            <button id="goToWaiting">Go to Waiting Page</button>
+        </div>
+        <button id="backToForm" style="display:none; position:absolute; top:10px; left:10px;">Back</button>
+
     </div>
 
     <div id="adminScreen" class="screen">
         <h3>Admin Panel</h3>
         <button onclick="serveNext()" >Serve Next</button>
         <button onclick="resetQueue()">Reset Queue</button>
-
-        <p><strong>Current Token:</strong> <span id="currentToken">None</span></p>
+        <button onclick="openWaitingList()">Waiting List</button>
 
         <h4>Queue Details</h4>
         <table id="adminTable" border="1" style="width:100%; margin-top:10px; border-collapse: collapse;">
