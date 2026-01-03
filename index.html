@@ -1,10 +1,37 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Queue System</title>
+    <meta charset="UTF-8">
+    <title>Queue Management System</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <h2>Queue Management System</h2>
 
-<script src="script.js"></script>
+    <div class="switch-buttons">
+        <button onclick="showUserScreen()" >User Screen</button>
+        <button onclick="showAdminScreen()" >Admin Screen</button>
+    </div>
+
+    <hr>
+
+    <div id="userScreen" class="screen">
+        <h3>User Panel</h3>
+        <button onclick="generateToken()" >Generate Token</button>
+        <p><strong>Your Token :</strong> <span id="userToken">None</span></p>
+    </div>
+
+    <div id="adminScreen" class="screen">
+        <h3>Admin Panel</h3>
+        <button onclick="serveNext()" >Serve Next</button>
+        <button onclick="resetQueue()">Reset Queue</button>
+        
+        <p><strong>Current Token:</strong> <span id="currentToken">None</span></p>
+
+        <h4>Queue</h4>
+        <ul id="queueList"></ul>
+    </div>
+
+    <script src="script.js"></script>
 </body>
 </html>
