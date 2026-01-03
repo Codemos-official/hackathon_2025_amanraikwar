@@ -17,7 +17,18 @@
 
     <div id="userScreen" class="screen">
         <h3>User Panel</h3>
-        <button onclick="generateToken()" >Generate Token</button>
+
+        <form id="userForm" autocomplete="off">
+            <label for="name">Full Name:</label>
+            <input type="text" id="name" maxlength="30" autocomplete="off" placeholder="Only alphabets allowed (Max 30)" required>
+            <p id="nameMessage"></p>
+
+            <label for="contact">Contact Number:</label>
+            <input type="text" id="contact" maxlength="10" autocomplete="off" placeholder="Only digits allowed (10 digits)" required>
+            <p id="contactMessage"></p>
+
+            <button type="submit" style="margin-top: 15px;">Generate Token</button>
+        </form>
         <p><strong>Your Token :</strong> <span id="userToken">None</span></p>
     </div>
 
@@ -25,7 +36,7 @@
         <h3>Admin Panel</h3>
         <button onclick="serveNext()" >Serve Next</button>
         <button onclick="resetQueue()">Reset Queue</button>
-        
+
         <p><strong>Current Token:</strong> <span id="currentToken">None</span></p>
 
         <h4>Queue</h4>

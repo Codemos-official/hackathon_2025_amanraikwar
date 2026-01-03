@@ -93,7 +93,77 @@ function updateQueueUI() {
 }
 
 //===================================================================================================
+// User Form Handling
+const userForm = document.getElementById('userForm');
 
+const nameInput = document.getElementById('name');
+const nameMessage = document.getElementById('nameMessage');
+
+const contactInput = document.getElementById('contact');
+const contactMessage = document.getElementById('contactMessage');
+
+// Name validation with real-time message
+nameInput.addEventListener('input', () => {
+    // Allow only alphabets & space
+    nameInput.value = nameInput.value.replace(/[^a-zA-Z ]/g, '');
+
+    // Auto-capitalize
+    const words = nameInput.value.split(' ');
+    for (let i = 0; i < words.length; i++) {
+        if (words[i]) {
+            words[i] =
+                words[i][0].toUpperCase() +
+                words[i].slice(1).toLowerCase();
+        }
+    }
+    nameInput.value = words.join(' ');
+
+    // Max 30 characters
+    if (nameInput.value.length > 30) {
+        nameInput.value = nameInput.value.slice(0, 30);
+    }
+
+    // Green info message
+    if (nameInput.value.length > 0) {
+        nameMessage.textContent = "Max 30 characters";
+        nameMessage.className = "valid";
+    } else {
+        nameMessage.textContent = "";
+        nameMessage.className = "";
+    }
+});
+
+
+//---------------------------------------------------------------------------------------------------
+
+// Contact validation with real-time message
+contactInput.addEventListener('input', () => {
+    // Digits only
+    contactInput.value = contactInput.value.replace(/\D/g, '');
+
+    // Max 10 digits
+    if (contactInput.value.length > 10) {
+        contactInput.value = contactInput.value.slice(0, 10);
+    }
+
+    // No message before typing
+    if (contactInput.value.length === 0) {
+        contactMessage.textContent = "";
+        contactMessage.className = "";
+        return;
+    }
+
+    // Real-time validation
+    if (contactInput.value.length === 10) {
+        contactMessage.textContent = "Valid contact number";
+        contactMessage.className = "valid";
+    } else {
+        contactMessage.textContent = "Invalid contact number";
+        contactMessage.className = "invalid";
+    }
+});
+
+//===================================================================================================
 updateQueueUI();
 updateCurrentTokenUI();
-showUserScreen(); // default view
+showUserScreen(); 
