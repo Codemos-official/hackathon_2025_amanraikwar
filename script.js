@@ -1,13 +1,16 @@
-let queue = JSON.parse(localStorage.getItem("queue")) || [];
+//===================================================================================================
+// Initialize queue arrays
+let queueData = JSON.parse(localStorage.getItem("queueData")) || [];
 let tokenCounter = parseInt(localStorage.getItem("tokenCounter")) || 1;
 
+// Save to localStorage
 function saveToLocalStorage() {
-    localStorage.setItem("queue", JSON.stringify(queue));
+    localStorage.setItem("queueData", JSON.stringify(queueData));
     localStorage.setItem("tokenCounter", tokenCounter);
 }
 
 //===================================================================================================
-//Screen toggle functions
+// Screen toggle
 function showUserScreen() {
     document.getElementById("userScreen").style.display = "block";
     document.getElementById("adminScreen").style.display = "none";
@@ -19,151 +22,154 @@ function showAdminScreen() {
 }
 
 //===================================================================================================
-// Generation of New Token
-function generateToken(){
+// Generate Token
+function generateToken(userName, userContact) {
     const token = tokenCounter;
-    queue.push(token);
-    tokenCounter++;
 
+    // Add to queueData
+    queueData.push({ token: token, name: userName, contact: userContact });
+
+    tokenCounter++;
     saveToLocalStorage();
 
+    // Update user screen
     document.getElementById("userToken").textContent = token;
 
-    updateQueueUI();
-    updateCurrentTokenUI();
+    // Update admin UI
+    updateAdminTable();
 }
 
 //===================================================================================================
-// Function of serving next token in (first-in, first-out manner)
+// Serve Next Token
 function serveNext() {
-    if (queue.length === 0) {
-        console.log("No tokens in queue.");
+    if (queueData.length === 0) {
+        alert("No tokens in queue.");
         return;
     }
 
-    const servedToken = queue.shift();
+    // Remove first user
+    queueData.shift();
     saveToLocalStorage();
 
-    updateQueueUI();
-    updateCurrentTokenUI();
+    // Update admin UI
+    updateAdminTable();
 }
 
 //===================================================================================================
-// Function for reseting the queue
+// Reset Queue
 function resetQueue() {
-    if (!confirm("Are you sure you want to reset the queue?")) {
-        return;
-    }
+    if (!confirm("Are you sure you want to reset the queue?")) return;
 
-    queue = [];
+    queueData = [];
     tokenCounter = 1;
-
-    localStorage.removeItem("queue");
-    localStorage.removeItem("tokenCounter");
-
-    updateQueueUI();
-    updateCurrentTokenUI();
+    saveToLocalStorage();
 
     document.getElementById("userToken").textContent = "None";
-
-    console.log("Queue has been reset successfully.");
+    updateAdminTable();
 }
 
 //===================================================================================================
-// Function for updating UI
-function updateCurrentTokenUI() {
-    const currentTokenElement = document.getElementById("currentToken");
+// Update Admin Table
+function updateAdminTable() {
+    const tbody = document.getElementById("adminTableBody");
+    tbody.innerHTML = "";
 
-    if (queue.length === 0) {
-        currentTokenElement.textContent = "None";
-    } else {
-        currentTokenElement.textContent = queue[0];
-    }
-}
+    queueData.forEach(item => {
+        const tr = document.createElement("tr");
 
-function updateQueueUI() {
-    const queueList = document.getElementById("queueList");
-    queueList.innerHTML = "";
+        const tdToken = document.createElement("td");
+        tdToken.textContent = item.token;
 
-    queue.forEach(token => {
-        const li = document.createElement("li");
-        li.textContent = `Token ${token}`;
-        queueList.appendChild(li);
+        const tdName = document.createElement("td");
+        tdName.textContent = item.name;
+
+        const tdContact = document.createElement("td");
+        tdContact.textContent = item.contact;
+
+        tr.appendChild(tdToken);
+        tr.appendChild(tdName);
+        tr.appendChild(tdContact);
+
+        tbody.appendChild(tr);
     });
 }
 
 //===================================================================================================
 // User Form Handling
-const userForm = document.getElementById('userForm');
+const userForm = document.getElementById("userForm");
+const nameInput = document.getElementById("name");
+const contactInput = document.getElementById("contact");
+const contactMessage = document.getElementById("contactMessage");
 
-const nameInput = document.getElementById('name');
-const nameMessage = document.getElementById('nameMessage');
+// Name Real-time validation
+nameInput.addEventListener("input", () => {
+    const originalValue = nameInput.value;
 
-const contactInput = document.getElementById('contact');
-const contactMessage = document.getElementById('contactMessage');
+    // Only alphabets and spaces
+    nameInput.value = nameInput.value.replace(/[^a-zA-Z ]/g, "");
 
-// Name validation with real-time message
-nameInput.addEventListener('input', () => {
-    // Allow only alphabets & space
-    nameInput.value = nameInput.value.replace(/[^a-zA-Z ]/g, '');
-
-    // Auto-capitalize
-    const words = nameInput.value.split(' ');
+    // Auto capitalize
+    const words = nameInput.value.split(" ");
     for (let i = 0; i < words.length; i++) {
-        if (words[i]) {
-            words[i] =
-                words[i][0].toUpperCase() +
-                words[i].slice(1).toLowerCase();
-        }
+        if (words[i]) words[i] = words[i][0].toUpperCase() + words[i].slice(1).toLowerCase();
     }
-    nameInput.value = words.join(' ');
+    nameInput.value = words.join(" ");
 
-    // Max 30 characters
-    if (nameInput.value.length > 30) {
-        nameInput.value = nameInput.value.slice(0, 30);
-    }
+    // Max 30 chars
+    if (nameInput.value.length > 30) nameInput.value = nameInput.value.slice(0, 30);
 
-    // Green info message
-    if (nameInput.value.length > 0) {
-        nameMessage.textContent = "Max 30 characters";
-        nameMessage.className = "valid";
+    // Show green message if max reached
+    if (nameInput.value.length === 30) {
+        nameInput.style.borderColor = "green";
     } else {
-        nameMessage.textContent = "";
-        nameMessage.className = "";
+        nameInput.style.borderColor = "";
     }
 });
 
+// Contact Real-time validation
+contactInput.addEventListener("input", () => {
+    contactInput.value = contactInput.value.replace(/\D/g, "");
 
-//---------------------------------------------------------------------------------------------------
+    if (contactInput.value.length > 10) contactInput.value = contactInput.value.slice(0, 10);
 
-// Contact validation with real-time message
-contactInput.addEventListener('input', () => {
-    // Digits only
-    contactInput.value = contactInput.value.replace(/\D/g, '');
-
-    // Max 10 digits
-    if (contactInput.value.length > 10) {
-        contactInput.value = contactInput.value.slice(0, 10);
-    }
-
-    // No message before typing
-    if (contactInput.value.length === 0) {
-        contactMessage.textContent = "";
-        contactMessage.className = "";
-        return;
-    }
-
-    // Real-time validation
     if (contactInput.value.length === 10) {
         contactMessage.textContent = "Valid contact number";
         contactMessage.className = "valid";
+    } else if (contactInput.value.length === 0) {
+        contactMessage.textContent = "";
+        contactMessage.className = "";
     } else {
         contactMessage.textContent = "Invalid contact number";
         contactMessage.className = "invalid";
     }
 });
 
+// Form Submit
+userForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const name = nameInput.value.trim();
+    const contact = contactInput.value.trim();
+
+    if (name === "") {
+        alert("Please enter your name.");
+        return;
+    }
+    if (contact.length !== 10) {
+        alert("Please enter a valid 10-digit contact number.");
+        return;
+    }
+
+    // Generate token
+    generateToken(name, contact);
+
+    // Reset form
+    userForm.reset();
+    contactMessage.textContent = "";
+    nameInput.style.borderColor = "";
+});
+
 //===================================================================================================
-updateQueueUI();
-updateCurrentTokenUI();
-showUserScreen(); 
+// Initialize
+updateAdminTable();
+showUserScreen();
